@@ -1,0 +1,31 @@
+Objective 1: Analyzing Vendor Performance
+Analytic Question:
+Which vendors provide the most cost-effective products and generate the highest revenue for the marketplace?
+Purpose:
+This question helps determine the best-performing vendors based on price, sales volume, and the commission generated for the marketplace.
+Design Consideration:
+
+Ensure that vendor performance data (e.g., product prices, orders, commissions) is easily retrievable through proper indexing and relationships.
+
+###########################################################################################
+
+
+Objective 2: Understanding Shopper Behavior
+Analytic Question:
+What is the correlation between time spent on the site and the likelihood of placing an order or leaving a product review?
+Purpose:
+This helps optimize the user experience by identifying factors that lead to higher conversions and customer engagement.
+Design Consideration:
+
+Track metrics like time_spent_on_site and link them to orders and product_reviews.
+
+###########################################################################################
+
+Objective 3: Identifying Delivery Issues and Fraud Patterns
+Analytic Question:
+What are the most common reasons for delivery failures and how do they correlate with return fraud incidents?
+Purpose:
+This aims to reduce costs by identifying trends in delivery issues and fraudulent activities.
+Design Consideration:
+
+Collect detailed data on delivery outcomes (e.g., failure_reason) and fraud indicators to enable effective analytics.
