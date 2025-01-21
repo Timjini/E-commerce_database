@@ -1,5 +1,5 @@
 # Use the official Python image from Docker Hub
-FROM python:3.9-slim
+FROM python:3.9-slim AS base
 
 WORKDIR /app
 
@@ -10,5 +10,11 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 COPY . .
+
+FROM base as debugger
+RUN pip install debugpy
+ENTRYPOINT [ "python","-m","debugpy","--listen","0.0.0.0:5678","--wait-for-client","-m" ]
+
+FROM base as primay
 
 CMD ["/app/entrypoint.sh"]

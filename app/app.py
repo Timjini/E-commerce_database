@@ -12,35 +12,25 @@ try:
     create_tables_from_sql(connection, sql_data)
     if connection.is_connected():
         print("Successfully connected to the database")
-
-        cursor = connection.cursor()
-
         required_tables = ['products', 'shoppers', 'vendors', 'orders', 'vendor_products']
 
         while not check_tables_exist(connection, required_tables):
             time.sleep(5)  
+            print("table not found")
 
-        # # Insert data into tables
-        print("Inserting data into products...")
-        insert_fake_data(cursor, "products", 1000)
+        insert_fake_data(connection, "products", 1000)
 
-        print("Inserting data into shoppers...")
-        insert_fake_data(cursor, "shoppers", 1000)
-
-        print("Inserting data into vendors...")
-        insert_fake_data(cursor, "vendors", 1000)
-
-        # Insert orders for each shopper
-        print("Inserting order items for orders...")
-        insert_order_items(cursor, num_order_items=5, num_orders=1000, num_products=100, num_vendors=50)
-
-        print("Inserting vendor products...")
-        insert_vendor_products(cursor, num_vendors=1000, num_products=1000)
-
-        connection.commit()
-        print("Fake data inserted successfully")
-
-        cursor.close()
+        # try:
+        #     insert_fake_data(connection, "products", 1000)
+        #     insert_fake_data(connection, "shoppers", 1000)
+        #     insert_fake_data(connection, "vendors", 1000)
+        #     # insert_order_items(cursor, num_order_items=5, num_orders=1000, num_products=100, num_vendors=50)
+        #     # insert_vendor_products(cursor, num_vendors=1000, num_products=1000)
+        #     # connection.commit()
+        #     print("Fake data inserted successfully")
+        # except Exception as e:
+        #     print(f"Error inserting data: {e}")
+        #     connection.rollback()
 
 except Error as e:
     print(f"Error: {e}")
