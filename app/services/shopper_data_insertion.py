@@ -51,7 +51,7 @@ def insert_time_spent_data(cursor, connection, num_records=1000):
             
             duration_minutes = random.randint(1, 120)
 
-            session_date = None if random.random() < 0.2 else fake.date_this_year()
+            session_date = fake.date_this_year()
 
             cursor.execute("""
                 INSERT INTO time_spent (shopper_id, duration_minutes, session_date)

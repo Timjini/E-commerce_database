@@ -4,46 +4,83 @@ import random
 
 fake = Faker()
 fake.add_provider(CommerceProvider)
+
 def insert_fake_data(cursor, connection, table_name, num_rows=1000):
     print(f"Inserting data into {table_name}...")
+    
     try:
+        # map to track vendor.email and shopper.email to avoid duplicates and vendor.tax_number
+        used_emails = set()
+        used_tax_numbers = set()
+
+        # Fetch existing emails & tax numbers from the database once
+        if table_name == "shoppers":
+            cursor.execute("SELECT email FROM shoppers")
+            used_emails.update(row[0] for row in cursor.fetchall())
+        elif table_name == "vendors":
+            cursor.execute("SELECT contact_email, tax_number FROM vendors")
+            for email, tax_number in cursor.fetchall():
+                used_emails.add(email)
+                used_tax_numbers.add(tax_number)
+
         for _ in range(num_rows):
             if table_name == "products":
                 name = fake.ecommerce_name()
-                cost = round(fake.random_number(digits=2), 2)
+                cost = round(random.uniform(0.01, 99.99), 2)
                 description = f"{name}: {fake.sentence()}"
                 cursor.execute(
-                    f"INSERT INTO {table_name} (name, cost, description) VALUES (%s, %s, %s)",
+                    "INSERT INTO products (name, cost, description) VALUES (%s, %s, %s)",
                     (name, cost, description)
                 )
             elif table_name == "shoppers":
                 first_name = fake.first_name()
                 last_name = fake.last_name()
+                
+                # Generate a unique email
                 email = fake.email()
+                while email in used_emails:
+                    email = fake.email()
+                used_emails.add(email)
+
                 phone_number = fake.phone_number()[:20]
                 address = fake.address()
                 is_member = fake.boolean()
                 cursor.execute(
-                    f"INSERT INTO {table_name} (first_name, last_name, email, phone_number, address, is_member) VALUES (%s, %s, %s, %s, %s, %s)",
+                    "INSERT INTO shoppers (first_name, last_name, email, phone_number, address, is_member) VALUES (%s, %s, %s, %s, %s, %s)",
                     (first_name, last_name, email, phone_number, address, is_member)
                 )
             elif table_name == "vendors":
                 contact_name = fake.name()
                 company_name = fake.company()
+                
+                # Generate a unique email
                 contact_email = fake.email()
+                while contact_email in used_emails:
+                    contact_email = fake.email()
+                used_emails.add(contact_email)
+
                 contact_phone = fake.phone_number()[:20]
                 address = fake.address()
+                
+                # Generate a unique tax number
                 tax_number = fake.random_int(min=100000000, max=999999999)
-                commission_rate = round(fake.random_number(digits=2), 2)
+                while tax_number in used_tax_numbers:
+                    tax_number = fake.random_int(min=100000000, max=999999999)
+                used_tax_numbers.add(tax_number)
+
+                commission_rate = round(random.uniform(0.01, 100.00), 2)
                 cursor.execute(
-                    f"INSERT INTO {table_name} (contact_name, company_name, contact_email, contact_phone, address, tax_number, commission_rate) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    "INSERT INTO vendors (contact_name, company_name, contact_email, contact_phone, address, tax_number, commission_rate) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                     (contact_name, company_name, contact_email, contact_phone, address, tax_number, commission_rate)
                 )
+
         connection.commit()
         print(f"{num_rows} rows inserted into {table_name}")
-    except Exception as e:
+
+    except mysql.connector.Error as e:
         connection.rollback()
         print(f"Error inserting data into {table_name}: {e}")
+
 
             
 def insert_orders_for_shoppers(cursor, num_orders):
