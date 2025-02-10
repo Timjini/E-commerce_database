@@ -1,16 +1,17 @@
 from faker import Faker
+from faker_commerce import Provider as CommerceProvider
 import random
 
 fake = Faker()
-
+fake.add_provider(CommerceProvider)
 def insert_fake_data(cursor, connection, table_name, num_rows=1000):
     print(f"Inserting data into {table_name}...")
     try:
         for _ in range(num_rows):
             if table_name == "products":
-                name = fake.word()
+                name = fake.ecommerce_name()
                 cost = round(fake.random_number(digits=2), 2)
-                description = fake.text(max_nb_chars=200)
+                description = f"{name}: {fake.sentence()}"
                 cursor.execute(
                     f"INSERT INTO {table_name} (name, cost, description) VALUES (%s, %s, %s)",
                     (name, cost, description)
@@ -38,17 +39,15 @@ def insert_fake_data(cursor, connection, table_name, num_rows=1000):
                     f"INSERT INTO {table_name} (contact_name, company_name, contact_email, contact_phone, address, tax_number, commission_rate) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                     (contact_name, company_name, contact_email, contact_phone, address, tax_number, commission_rate)
                 )
-        # Commit the transaction
         connection.commit()
         print(f"{num_rows} rows inserted into {table_name}")
     except Exception as e:
-        # Rollback in case of any error
         connection.rollback()
         print(f"Error inserting data into {table_name}: {e}")
 
             
 def insert_orders_for_shoppers(cursor, num_orders):
-    # Fetch all shopper IDs
+    # fetch all shopper IDs
     cursor.execute("SELECT id FROM shoppers")
     shoppers = cursor.fetchall()
     
@@ -101,7 +100,6 @@ def insert_vendor_products(cursor, connection):
             print("No products found.")
             return
 
-        # vendor-product associations
         for vendor in vendors:
             vendor_id = vendor[0]
             commission_rate = vendor[1]
@@ -110,7 +108,7 @@ def insert_vendor_products(cursor, connection):
                 product_id = product[0]
                 product_cost = product[1]
 
-                # calcualte vendor product based on commission
+                # calculate vendor product based on commission
                 price = round(product_cost * (1 + commission_rate / 100), 2)
 
                 try:
@@ -125,6 +123,5 @@ def insert_vendor_products(cursor, connection):
         connection.commit()
         print("Vendor-product associations inserted successfully.")
     except Exception as e:
-        # rollback when issue
         connection.rollback()
         print(f"Error inserting vendor-products: {e}")

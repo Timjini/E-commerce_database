@@ -1,4 +1,3 @@
-# Use the official Python image from Docker Hub
 FROM python:3.9-slim AS base
 
 WORKDIR /app

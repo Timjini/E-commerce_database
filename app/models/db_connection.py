@@ -35,3 +35,4 @@ def check_tables_exist(connection, tables):
             print(f"Table {table} does not exist. Waiting for table to be created...")
             return False
     return True
+
