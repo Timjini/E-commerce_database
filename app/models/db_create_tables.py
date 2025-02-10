@@ -30,7 +30,7 @@ def create_tables_from_sql(connection, sql_file_path):
         insert_fake_data(cursor, connection, "shoppers", 1000)
         insert_fake_data(cursor, connection, "vendors", 1000)
         insert_vendor_products(cursor, connection)
-        insert_orders_data(cursor, connection, num_orders=1000)
+        insert_orders_data(cursor, connection, num_orders=10000)
         insert_order_items_data(cursor, connection, max_items_per_order=5)
         insert_revenue_data(cursor, connection)
         insert_reviews_data(cursor, connection, num_reviews=1000)
